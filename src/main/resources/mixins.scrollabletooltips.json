@@ -4,7 +4,6 @@
   "refmap": "mixins.scrollabletooltips.refmap.json",
   "client": [
     "AccessorContainerScreen",
-    "MinecraftMixin",
     "TooltipMixin"
     //#if MC>11600
     , "MouseMixin"

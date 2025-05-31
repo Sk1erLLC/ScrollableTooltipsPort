@@ -13,41 +13,72 @@ base.archivesName.set("$modBaseName-${platform.mcVersionStr}-${platform.loaderSt
 
 loom {
     noServerRunConfigs()
-    mixin {
-        defaultRefmapName.set("mixins.scrollabletooltips.refmap.json")
-    }
-    launchConfigs {
-        getByName("client") {
-            arg("--tweakClass", "gg.essential.loader.stage0.EssentialSetupTweaker")
-            arg("--mixin", "mixins.scrollabletooltips.json")
+
+    if (project.platform.isLegacyForge) {
+        runConfigs {
+            "client" {
+                programArgs("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
+                programArgs("--mixin", "mixins.scrollabletooltips.json")
+                property("mixin.debug.export", "true")
+                property("mixin.debug.verbose", "true")
+                property("mixin.dumpTargetOnFailure", "true")
+            }
         }
     }
+
+    if (project.platform.isForge) {
+        forge {
+            mixinConfig("mixins.scrollabletooltips.json")
+        }
+    }
+
+    mixin.defaultRefmapName.set("mixins.scrollabletooltips.refmap.json")
 }
 
 repositories {
     maven("https://repo.spongepowered.org/repository/maven-public/")
+    maven("https://repo.essential.gg/repository/maven-public")
+    maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
 }
 
 val embed by configurations.creating
 configurations.implementation.get().extendsFrom(embed)
 
 dependencies {
-    compileOnly("gg.essential:essential-$platform:2666")
-    embed("gg.essential:loader-launchwrapper:1.1.3")
+    if (project.platform.isFabric) {
+        implementation(include("gg.essential:vigilance:306")!!)
+        modImplementation(include("gg.essential:universalcraft-${platform.mcVersionStr}-fabric:401")!!)
+    } else if (project.platform.isForge || project.platform.isLegacyForge) {
+        embed("gg.essential:vigilance:306")!!
+        embed("gg.essential:universalcraft-${platform.mcVersionStr}-forge:401")!!
+    }
 
-    compileOnly("org.spongepowered:mixin:0.8.5-SNAPSHOT")
+    if (project.platform.isLegacyForge) {
+        embed("org.spongepowered:mixin:0.7.11-SNAPSHOT")
+    }
+
+    val devAuthPlatform = when {
+        platform.isFabric -> "fabric"
+        platform.isLegacyForge -> "forge-legacy"
+        platform.isForge -> "forge-latest"
+        else -> error("Unable to determine platform")
+    }
+
+    modLocalRuntime("me.djtheredstoner:DevAuth-${devAuthPlatform}:1.2.1")
 }
 
-tasks.jar {
-    from(embed.files.map { zipTree(it) })
+tasks {
+    jar {
+        from(embed.files.map { zipTree(it) })
 
-    manifest.attributes(
-        mapOf(
-            "ModSide" to "CLIENT",
-            "FMLCorePluginContainsFMLMod" to "Yes, yes it does",
-            "TweakClass" to "gg.essential.loader.stage0.EssentialSetupTweaker",
-            "MixinConfigs" to "mixins.scrollabletooltips.json",
-            "TweakOrder" to "0"
+        manifest.attributes(
+            mapOf(
+                "ModSide" to "CLIENT",
+                "FMLCorePluginContainsFMLMod" to "Yes, yes it does",
+                "MixinConfigs" to "mixins.scrollabletooltips.json",
+                "TweakClass" to "org.spongepowered.asm.launch.MixinTweaker",
+                "TweakOrder" to "0"
+            )
         )
-    )
+    }
 }

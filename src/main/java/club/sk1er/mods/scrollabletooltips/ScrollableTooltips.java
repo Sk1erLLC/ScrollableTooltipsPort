@@ -2,7 +2,6 @@ package club.sk1er.mods.scrollabletooltips;
 
 
 import club.sk1er.mods.scrollabletooltips.command.ScrollableTooltipsCommand;
-import gg.essential.api.EssentialAPI;
 //#if FORGE
 import net.minecraftforge.fml.common.Mod;
 //#if MC>11600
