@@ -1,26 +1,25 @@
 package club.sk1er.mods.scrollabletooltips.mixin;
 
+
 import club.sk1er.mods.scrollabletooltips.GuiUtilsOverride;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import gg.essential.universal.UMatrixStack;
 import gg.essential.universal.UMinecraft;
 import gg.essential.universal.UScreen;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.util.IReorderingProcessor;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.tooltip.TooltipComponent;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.screen.slot.Slot;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 
-//FIXME: Use sugars when possible
 @Mixin(Screen.class)
 public class TooltipMixin {
     // Mixin Constants
@@ -28,16 +27,10 @@ public class TooltipMixin {
     @Unique
     private static final String scrollableTooltips$mixinTarget =
         //#if FORGE
-        //#if MC<11700
-        "renderToolTip";
-        //#else
         //$$ "renderTooltipInternal";
+        //#else
+        "renderTooltipFromComponents";
         //#endif
-        //#endif
-        //#if FABRIC
-        //$$ "renderOrderedTooltip";
-        //#endif
-
     @Unique
     private static final int scrollableTooltips$tooltipYOrdinal =
         4;
@@ -62,16 +55,6 @@ public class TooltipMixin {
     private static final int scrollableTooltips$tooltipWidthOrdinal =
         2;
 
-    // Captured Values
-    @Unique
-    private int scrollableTooltips$tooltipY = 0;
-    @Unique
-    private int scrollableTooltips$tooltipX = 0;
-    @Unique
-    private int scrollableTooltips$tooltipHeight = 0;
-    @Unique
-    private int scrollableTooltips$tooltipWidth = 0;
-
     // Internal Values
     @Unique
     private final UMatrixStack scrollableTooltips$matrixStack = new UMatrixStack();
@@ -81,8 +64,8 @@ public class TooltipMixin {
     @Inject(method = scrollableTooltips$mixinTarget, at = @At("HEAD"))
     private void scrollableTooltips$detectItemChange(CallbackInfo ci) {
         Screen currentScreen = UMinecraft.getMinecraft().currentScreen;
-        if (currentScreen instanceof ContainerScreen) {
-            Slot hoveredSlot = (((AccessorContainerScreen) currentScreen)).getHoveredSlot();
+        if (currentScreen instanceof HandledScreen<?>) {
+            Slot hoveredSlot = (((AccessorAbstractContainerScreen) currentScreen)).getFocusedSlot();
             if (scrollableTooltips$currentSlot != hoveredSlot) {
                 scrollableTooltips$currentSlot = hoveredSlot;
                 GuiUtilsOverride.resetScroll();
@@ -90,95 +73,39 @@ public class TooltipMixin {
         }
     }
 
-    @ModifyVariable(
-        method = scrollableTooltips$mixinTarget,
-        at = @At("STORE"),
-        slice = @Slice(to = @At(value = "INVOKE", target = "Ljava/util/List;size()I")),
-        ordinal = scrollableTooltips$tooltipYOrdinal
-    )
-    private int scrollableTooltips$captureTooltipY(int tooltipY) {
-        scrollableTooltips$tooltipY = tooltipY;
-        return 0;
-    }
-
-    @ModifyVariable(
-        method = scrollableTooltips$mixinTarget,
-        at = @At("STORE"),
-        slice = @Slice(from = @At(value = "INVOKE", target = "Ljava/util/List;size()I")),
-        ordinal = scrollableTooltips$tooltipYOrdinal
-    )
-    private int scrollableTooltips$ignoreTooltipY(int tooltipY) {
-        return 0;
-    }
-
-    @ModifyVariable(
-        method = scrollableTooltips$mixinTarget,
-        at = @At("STORE"),
-        ordinal = scrollableTooltips$tooltipHeightOrdinal
-    )
-    private int scrollableTooltips$captureTooltipHeight(int tooltipHeight) {
-        scrollableTooltips$tooltipHeight = tooltipHeight;
-        return tooltipHeight;
-    }
-
-    @ModifyVariable(
-        method = scrollableTooltips$mixinTarget,
-        at = @At("STORE"),
-        slice = @Slice(to = @At(value = "INVOKE", target = "Ljava/util/List;size()I")),
-        ordinal = scrollableTooltips$tooltipXOrdinal
-    )
-    private int scrollableTooltips$captureTooltipX(int tooltipX) {
-        scrollableTooltips$tooltipX = tooltipX;
-        return 0;
-    }
-
-    @ModifyVariable(
-        method = scrollableTooltips$mixinTarget,
-        at = @At("STORE"),
-        slice = @Slice(from = @At(value = "INVOKE", target = "Ljava/util/List;size()I")),
-        ordinal = scrollableTooltips$tooltipXOrdinal
-    )
-    private int scrollableTooltips$ignoreTooltipX(int tooltipX) {
-        return 0;
-    }
-
-    @ModifyVariable(
-        method = scrollableTooltips$mixinTarget,
-        at = @At("STORE"),
-        ordinal = scrollableTooltips$tooltipWidthOrdinal
-    )
-    private int scrollableTooltips$captureTooltipWidth(int tooltipWidth) {
-        scrollableTooltips$tooltipWidth = tooltipWidth;
-        return tooltipWidth;
-    }
-
-
     @Inject(
         method = scrollableTooltips$mixinTarget,
         at = @At(
             value = "INVOKE",
-            target = "Lcom/mojang/blaze3d/matrix/MatrixStack;push()V",
+            target = "Lnet/minecraft/client/util/math/MatrixStack;push()V",
             shift = At.Shift.AFTER
         )
     )
-    private void scrollableTooltips$pushMatrixAndTranslate(MatrixStack arg, List<? extends IReorderingProcessor> list, int m, int n,
-                                                           //#if FORGE && MC>11600
-                                                           FontRenderer font,
-                                                           //#endif
-                                                           CallbackInfo ci) {
+    private void scrollableTooltips$pushMatrixAndTranslate(
+        MatrixStack arg, List<TooltipComponent> list, int m, int n, CallbackInfo ci,
+        @Local(ordinal = scrollableTooltips$tooltipXOrdinal) LocalIntRef tooltipXRef,
+        @Local(ordinal = scrollableTooltips$tooltipWidthOrdinal) int tooltipWidthRef,
+        @Local(ordinal = scrollableTooltips$tooltipYOrdinal) LocalIntRef tooltipYRef,
+        @Local(ordinal = scrollableTooltips$tooltipHeightOrdinal) int tooltipHeightRef
+    ) {
         scrollableTooltips$matrixStack.push();
+        int tooltipX = tooltipXRef.get();
+        tooltipXRef.set(0);
+        int tooltipY = tooltipYRef.get();
+        tooltipYRef.set(0);
 
         // Replicate original behavior
-        if (scrollableTooltips$tooltipX + scrollableTooltips$tooltipWidth > UScreen.getCurrentScreen().width) {
-            scrollableTooltips$tooltipX -= 28 + scrollableTooltips$tooltipWidth;
+        Screen screen = UScreen.getCurrentScreen();
+        if (tooltipX + tooltipWidthRef > screen.width) {
+            tooltipX -= 28 + tooltipWidthRef;
         }
 
-        if (scrollableTooltips$tooltipY + scrollableTooltips$tooltipHeight + 6 > UScreen.getCurrentScreen().height) {
-            scrollableTooltips$tooltipY = UScreen.getCurrentScreen().height - scrollableTooltips$tooltipHeight - 6;
+        if (tooltipY + tooltipHeightRef + 6 > screen.height) {
+            tooltipY = screen.height - tooltipHeightRef - 6;
         }
 
-        scrollableTooltips$matrixStack.translate(scrollableTooltips$tooltipX, scrollableTooltips$tooltipY, 0.0);
-        GuiUtilsOverride.drawHoveringText(scrollableTooltips$matrixStack, scrollableTooltips$tooltipY, scrollableTooltips$tooltipHeight);
+        scrollableTooltips$matrixStack.translate(tooltipX, tooltipY, 0.0);
+        GuiUtilsOverride.drawHoveringText(scrollableTooltips$matrixStack, tooltipY, tooltipHeightRef);
         scrollableTooltips$matrixStack.applyToGlobalState();
     }
 
@@ -186,14 +113,10 @@ public class TooltipMixin {
         method = scrollableTooltips$mixinTarget,
         at = @At(
             value = "INVOKE",
-            target = "Lcom/mojang/blaze3d/matrix/MatrixStack;pop()V"
+            target = "Lnet/minecraft/client/util/math/MatrixStack;pop()V"
         )
     )
-    private void scrollableTooltips$popMatrix(MatrixStack arg, List<? extends IReorderingProcessor> list, int m, int n,
-                                              //#if FORGE && MC>11600
-                                              FontRenderer font,
-                                              //#endif
-                                              CallbackInfo ci) {
+    private void scrollableTooltips$popMatrix(MatrixStack arg, List<TooltipComponent> list, int m, int n, CallbackInfo ci) {
         scrollableTooltips$matrixStack.pop();
     }
 }

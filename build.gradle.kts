@@ -13,26 +13,6 @@ base.archivesName.set("$modBaseName-${platform.mcVersionStr}-${platform.loaderSt
 
 loom {
     noServerRunConfigs()
-
-    if (project.platform.isLegacyForge) {
-        runConfigs {
-            "client" {
-                programArgs("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
-                programArgs("--mixin", "mixins.scrollabletooltips.json")
-                property("mixin.debug.export", "true")
-                property("mixin.debug.verbose", "true")
-                property("mixin.dumpTargetOnFailure", "true")
-            }
-        }
-    }
-
-    if (project.platform.isForge) {
-        forge {
-            mixinConfig("mixins.scrollabletooltips.json")
-        }
-    }
-
-    mixin.defaultRefmapName.set("mixins.scrollabletooltips.refmap.json")
 }
 
 repositories {
@@ -41,44 +21,28 @@ repositories {
     maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
 }
 
-val embed by configurations.creating
-configurations.implementation.get().extendsFrom(embed)
-
 dependencies {
-    if (project.platform.isFabric) {
-        implementation(include("gg.essential:vigilance:306")!!)
-        modImplementation(include("gg.essential:universalcraft-${platform.mcVersionStr}-fabric:401")!!)
-    } else if (project.platform.isForge || project.platform.isLegacyForge) {
-        embed("gg.essential:vigilance:306")!!
-        embed("gg.essential:universalcraft-${platform.mcVersionStr}-forge:401")!!
-    }
+    implementation(include("gg.essential:vigilance:306")!!)
 
-    if (project.platform.isLegacyForge) {
-        embed("org.spongepowered:mixin:0.7.11-SNAPSHOT")
+    val ucPlatform = when {
+        platform.isFabric -> "fabric"
+        platform.isForge -> "forge"
+        platform.isNeoForge -> "neoforge"
+        else -> error("Unable to determine platform")
+    }
+    modImplementation(include("gg.essential:universalcraft-${platform.mcVersionStr}-${ucPlatform}:401")!!)
+
+    if (project.platform.isForge) {
+        compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1")!!)
+        implementation(include("io.github.llamalad7:mixinextras-forge:0.4.1")!!)
     }
 
     val devAuthPlatform = when {
         platform.isFabric -> "fabric"
-        platform.isLegacyForge -> "forge-legacy"
         platform.isForge -> "forge-latest"
+        platform.isNeoForge -> "neoforge"
         else -> error("Unable to determine platform")
     }
 
     modLocalRuntime("me.djtheredstoner:DevAuth-${devAuthPlatform}:1.2.1")
-}
-
-tasks {
-    jar {
-        from(embed.files.map { zipTree(it) })
-
-        manifest.attributes(
-            mapOf(
-                "ModSide" to "CLIENT",
-                "FMLCorePluginContainsFMLMod" to "Yes, yes it does",
-                "MixinConfigs" to "mixins.scrollabletooltips.json",
-                "TweakClass" to "org.spongepowered.asm.launch.MixinTweaker",
-                "TweakOrder" to "0"
-            )
-        )
-    }
 }

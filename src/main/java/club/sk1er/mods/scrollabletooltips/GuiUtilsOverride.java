@@ -3,6 +3,7 @@ package club.sk1er.mods.scrollabletooltips;
 import gg.essential.universal.UKeyboard;
 import gg.essential.universal.UMatrixStack;
 import gg.essential.universal.UScreen;
+import net.minecraft.client.gui.screen.Screen;
 
 @SuppressWarnings("unused")
 public class GuiUtilsOverride {
@@ -14,15 +15,16 @@ public class GuiUtilsOverride {
     public static double zoomFactor = 1.0;
 
     public static void drawHoveringText(UMatrixStack matrixStack, int tooltipY, int tooltipHeight) {
-        assert UScreen.getCurrentScreen() != null;
+        Screen screen = UScreen.getCurrentScreen();
+        assert screen != null;
 
         if (needsReset) {
             scrollX = 0;
             allowScrolling =
                     // Check if the tooltip is larger than the screen
-                    (tooltipHeight + 12) > UScreen.getCurrentScreen().height ||
+                    (tooltipHeight + 12) > screen.height ||
                     // Also check if the tooltip goes off-screen
-                    Math.abs(tooltipY) + tooltipHeight > UScreen.getCurrentScreen().height;
+                    Math.abs(tooltipY) + tooltipHeight > screen.height;
             if (allowScrolling && Config.startAtTop) {
                 scrollY = 6 - tooltipY;
             } else {
@@ -35,7 +37,7 @@ public class GuiUtilsOverride {
         if (!Config.masterToggle) return;
 
         if (allowScrolling) {
-            int screenHeight = UScreen.getCurrentScreen().height;
+            int screenHeight = screen.height;
             int max = 6 - tooltipY;
             int min = screenHeight - tooltipY - tooltipHeight - 6;
             if (scrollY > max) {

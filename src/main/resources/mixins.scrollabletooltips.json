@@ -3,7 +3,7 @@
   "package": "club.sk1er.mods.scrollabletooltips.mixin",
   "refmap": "mixins.scrollabletooltips.refmap.json",
   "client": [
-    "AccessorContainerScreen",
+    "AccessorAbstractContainerScreen",
     "TooltipMixin"
     //#if MC>11600
     , "MouseMixin"

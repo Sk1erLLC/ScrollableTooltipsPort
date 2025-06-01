@@ -48,8 +48,8 @@ public class Config extends Vigilant {
 
     public Config() {
         super(
-                new File(UMinecraft.getMinecraft().gameDir, "config/scrollable_tooltips.toml"),
-                "Scrollable Tooltips (" + ScrollableTooltips.MOD_VERSION + ")"
+                new File(UMinecraft.getMinecraft().runDirectory, "config/scrollable_tooltips.toml"),
+                ScrollableTooltips.MOD_NAME + " (" + ScrollableTooltips.MOD_VERSION + ")"
         );
         initialize();
 
