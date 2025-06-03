@@ -57,6 +57,5 @@ public class Config extends Vigilant {
         addDependency("verticalScrolling", "masterToggle");
         addDependency("zoom", "masterToggle");
         addDependency("startAtTop", "masterToggle");
-
     }
 }

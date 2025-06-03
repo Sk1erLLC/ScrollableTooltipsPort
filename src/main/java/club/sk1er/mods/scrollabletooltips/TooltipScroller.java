@@ -1,20 +1,21 @@
 package club.sk1er.mods.scrollabletooltips;
 
 import gg.essential.universal.UKeyboard;
-import gg.essential.universal.UMatrixStack;
 import gg.essential.universal.UScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.screen.slot.Slot;
 
-@SuppressWarnings("unused")
-public class GuiUtilsOverride {
-    public static boolean renderingTooltip = false;
+public class TooltipScroller {
     public static boolean needsReset;
     public static boolean allowScrolling;
     public static double scrollX = 0;
     public static double scrollY = 0;
-    public static double zoomFactor = 1.0;
+    public static float zoomFactor = 1.0f;
 
-    public static void drawHoveringText(UMatrixStack matrixStack, int tooltipY, int tooltipHeight) {
+    public static Slot currentSlot;
+
+    public static void translateTooltip(MatrixStack matrixStack, int tooltipY, int tooltipHeight) {
         Screen screen = UScreen.getCurrentScreen();
         assert screen != null;
 
@@ -30,7 +31,7 @@ public class GuiUtilsOverride {
             } else {
                 scrollY = 0;
             }
-            zoomFactor = 1.0;
+            zoomFactor = 1.0f;
             needsReset = false;
         }
 
@@ -48,7 +49,7 @@ public class GuiUtilsOverride {
         }
 
         matrixStack.translate(scrollX, scrollY, 0);
-        matrixStack.scale(zoomFactor, zoomFactor, 1.0);
+        matrixStack.scale(zoomFactor, zoomFactor, 1.0f);
     }
 
     public static void resetScroll() {
@@ -59,7 +60,7 @@ public class GuiUtilsOverride {
     public static boolean scroll(double delta) {
         if (allowScrolling) {
             if (UKeyboard.isCtrlKeyDown() && Config.zoom) {
-                zoomFactor *= (1.0 + 0.1 * Math.signum(delta));
+                zoomFactor *= (float) (1.0 + 0.1 * Math.signum(delta));
                 return true;
             } else if (UKeyboard.isShiftKeyDown() && Config.horizontalScrolling) {
                 scrollX += 10 * Math.signum(delta);

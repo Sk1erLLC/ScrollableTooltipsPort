@@ -4,6 +4,7 @@ plugins {
     kotlin("jvm")
     id("gg.essential.multi-version")
     id("gg.essential.defaults")
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 val modGroup: String by project
@@ -13,6 +14,10 @@ base.archivesName.set("$modBaseName-${platform.mcVersionStr}-${platform.loaderSt
 
 loom {
     noServerRunConfigs()
+    mixin {
+        useLegacyMixinAp = true
+        defaultRefmapName.set("mixins.scrollabletooltips.refmap.json")
+    }
 }
 
 repositories {
@@ -21,8 +26,19 @@ repositories {
     maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
 }
 
+val libraryInclude: Configuration by configurations.creating {
+    configurations.modImplementation.get().extendsFrom(this)
+}
+
 dependencies {
-    implementation(include("gg.essential:vigilance:306")!!)
+    if (platform.isFabric) {
+        implementation(include("gg.essential:vigilance:306")!!)
+    } else {
+        libraryInclude("gg.essential:vigilance:306") {
+            exclude(group = "org.jetbrains.kotlin")
+            exclude(module = "kotlinx-coroutines-core")
+        }
+    }
 
     val ucPlatform = when {
         platform.isFabric -> "fabric"
@@ -30,11 +46,17 @@ dependencies {
         platform.isNeoForge -> "neoforge"
         else -> error("Unable to determine platform")
     }
-    modImplementation(include("gg.essential:universalcraft-${platform.mcVersionStr}-${ucPlatform}:401")!!)
+    if (platform.isFabric) {
+        modImplementation(include("gg.essential:universalcraft-${platform.mcVersionStr}-fabric:401")!!)
+    } else {
+        libraryInclude("gg.essential:universalcraft-${platform.mcVersionStr}-${ucPlatform}:401") {
+            exclude(group = "org.jetbrains.kotlin")
+            exclude(module = "kotlinx-coroutines-core")
+        }
+    }
 
-    if (project.platform.isForge) {
-        compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1")!!)
-        implementation(include("io.github.llamalad7:mixinextras-forge:0.4.1")!!)
+    if (platform.isForge) {
+        libraryInclude(annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.0-rc.2")!!)
     }
 
     val devAuthPlatform = when {
@@ -45,4 +67,39 @@ dependencies {
     }
 
     modLocalRuntime("me.djtheredstoner:DevAuth-${devAuthPlatform}:1.2.1")
+}
+
+tasks {
+    jar {
+        if (!platform.isFabric) {
+            manifest.attributes("MixinConfigs" to "mixins.scrollabletooltips.json")
+        }
+
+        dependsOn(shadowJar)
+        archiveClassifier = null
+    }
+
+    remapJar {
+        dependsOn(shadowJar)
+        mustRunAfter(shadowJar)
+        inputFile = shadowJar.get().archiveFile
+        archiveClassifier = null
+    }
+
+    shadowJar {
+        configurations = listOf(libraryInclude)
+
+        if (!platform.isFabric) {
+            relocate("gg.essential.vigilance", "club.sk1er.mods.scrollabletooltips.vigilance")
+            relocate("gg.essential.elementa", "club.sk1er.mods.scrollabletooltips.elementa")
+            relocate("gg.essential.universal", "club.sk1er.mods.scrollabletooltips.universalcraft")
+
+            if (platform.isForge) {
+                relocate("com.llamalad7.mixinextras", "club.sk1er.mods.scrollabletooltips.mixinextras")
+            }
+        }
+        mergeServiceFiles()
+
+        finalizedBy(remapJar)
+    }
 }
