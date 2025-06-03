@@ -1,10 +1,19 @@
 {
   "schemaVersion": 1,
   "id": "scrollable_tooltips",
+  "name": "Scrollable Tooltips",
+  "description": "Allows for scrolling on tooltips",
   "version": "${version}",
   "environment": "client",
-  "mixins": ["mixins.scrollabletooltips.json"],
+  "mixins": [
+    "mixins.scrollabletooltips.json"
+  ],
   "depends": {
     "fabric-language-kotlin": ">=1.13.3+kotlin.2.1.21"
+  },
+  "entrypoints": {
+    "modmenu": [
+      "club.sk1er.mods.scrollabletooltips.ModMenuApiImpl"
+    ]
   }
 }

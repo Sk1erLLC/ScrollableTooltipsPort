@@ -24,6 +24,7 @@ repositories {
     maven("https://repo.spongepowered.org/repository/maven-public/")
     maven("https://repo.essential.gg/repository/maven-public")
     maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
+    maven("https://maven.terraformersmc.com/")
 }
 
 val libraryInclude: Configuration by configurations.creating {
@@ -31,15 +32,6 @@ val libraryInclude: Configuration by configurations.creating {
 }
 
 dependencies {
-    if (platform.isFabric) {
-        implementation(include("gg.essential:vigilance:306")!!)
-    } else {
-        libraryInclude("gg.essential:vigilance:306") {
-            exclude(group = "org.jetbrains.kotlin")
-            exclude(module = "kotlinx-coroutines-core")
-        }
-    }
-
     val ucPlatform = when {
         platform.isFabric -> "fabric"
         platform.isForge -> "forge"
@@ -47,16 +39,30 @@ dependencies {
         else -> error("Unable to determine platform")
     }
     if (platform.isFabric) {
-        modImplementation(include("gg.essential:universalcraft-${platform.mcVersionStr}-fabric:401")!!)
+        implementation(include("gg.essential:vigilance:306")!!)
+        implementation(include("gg.essential:elementa:706")!!)
+        modImplementation(include("gg.essential:universalcraft-${platform.mcVersionStr}-$ucPlatform:401")!!)
+
+        val modMenuVersion = when (platform.mcVersion) {
+            11902 -> "4.2.0-beta.2"
+            12006 -> "10.0.0"
+            12105 -> "14.0.0-rc.2"
+            else -> error("Unable to determine version")
+        }
+        modImplementation("com.terraformersmc:modmenu:$modMenuVersion")
     } else {
-        libraryInclude("gg.essential:universalcraft-${platform.mcVersionStr}-${ucPlatform}:401") {
+        libraryInclude("gg.essential:vigilance:306") {
             exclude(group = "org.jetbrains.kotlin")
             exclude(module = "kotlinx-coroutines-core")
         }
-    }
+        libraryInclude("gg.essential:universalcraft-${platform.mcVersionStr}-$ucPlatform:401") {
+            exclude(group = "org.jetbrains.kotlin")
+            exclude(module = "kotlinx-coroutines-core")
+        }
 
-    if (platform.isForge) {
-        libraryInclude(annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.0-rc.2")!!)
+        if (platform.isForge) {
+            libraryInclude(annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.0-rc.2")!!)
+        }
     }
 
     val devAuthPlatform = when {
@@ -65,7 +71,6 @@ dependencies {
         platform.isNeoForge -> "neoforge"
         else -> error("Unable to determine platform")
     }
-
     modLocalRuntime("me.djtheredstoner:DevAuth-${devAuthPlatform}:1.2.1")
 }
 
