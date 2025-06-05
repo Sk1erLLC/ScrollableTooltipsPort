@@ -1,6 +1,7 @@
 package club.sk1er.mods.scrollabletooltips.mixin;
 
 import club.sk1er.mods.scrollabletooltips.TooltipScroller;
+import club.sk1er.mods.scrollabletooltips.mixin.accessors.AccessorHandledScreen;
 import gg.essential.universal.UMinecraft;
 import gg.essential.universal.UScreen;
 import net.minecraft.client.Mouse;
@@ -13,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Mouse.class)
-public class MouseMixin {
+public class MouseMixin_CaptureScrolling {
 
     @Unique
     private static final String scrollableTooltips$mouseScrolledTarget =

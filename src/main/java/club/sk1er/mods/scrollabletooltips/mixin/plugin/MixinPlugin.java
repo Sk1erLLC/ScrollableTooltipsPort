@@ -1,4 +1,4 @@
-package club.sk1er.mods.scrollabletooltips.mixin;
+package club.sk1er.mods.scrollabletooltips.mixin.plugin;
 
 import com.llamalad7.mixinextras.MixinExtrasBootstrap;
 import org.objectweb.asm.tree.ClassNode;

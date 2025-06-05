@@ -1,4 +1,4 @@
-package club.sk1er.mods.scrollabletooltips.mixin;
+package club.sk1er.mods.scrollabletooltips.mixin.accessors;
 
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.slot.Slot;

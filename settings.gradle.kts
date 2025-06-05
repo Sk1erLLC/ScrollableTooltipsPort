@@ -23,7 +23,7 @@ listOf(
     "1.21.5-fabric",
     "1.21.5-forge",
     "1.21.5-neoforge",
-    ).forEach { version ->
+).forEach { version ->
     include(":$version")
     project(":$version").apply {
         projectDir = file("versions/$version")

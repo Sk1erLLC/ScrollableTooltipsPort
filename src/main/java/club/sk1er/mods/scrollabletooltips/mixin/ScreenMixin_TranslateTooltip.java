@@ -2,6 +2,7 @@ package club.sk1er.mods.scrollabletooltips.mixin;
 
 
 import club.sk1er.mods.scrollabletooltips.TooltipScroller;
+import club.sk1er.mods.scrollabletooltips.mixin.accessors.AccessorHandledScreen;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import gg.essential.universal.UScreen;
@@ -36,7 +37,7 @@ import net.minecraft.client.util.math.MatrixStack;
 //#else
 @Mixin(Screen.class)
 //#endif
-public class ScreenMixin {
+public class ScreenMixin_TranslateTooltip {
     // Mixin Constants
 
     @Unique

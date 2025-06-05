@@ -38,9 +38,8 @@ public class TooltipScroller {
         if (!Config.masterToggle) return;
 
         if (allowScrolling) {
-            int screenHeight = screen.height;
             int max = 6 - tooltipY;
-            int min = screenHeight - tooltipY - tooltipHeight - 6;
+            int min = screen.height - tooltipY - tooltipHeight - 6;
             if (scrollY > max) {
                 scrollY = max;
             } else if (scrollY < min) {

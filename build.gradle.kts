@@ -51,6 +51,10 @@ dependencies {
         }
         modImplementation("com.terraformersmc:modmenu:$modMenuVersion")
     } else {
+        libraryInclude("gg.essential:elementa:706") {
+            exclude(group = "org.jetbrains.kotlin")
+            exclude(module = "kotlinx-coroutines-core")
+        }
         libraryInclude("gg.essential:vigilance:306") {
             exclude(group = "org.jetbrains.kotlin")
             exclude(module = "kotlinx-coroutines-core")
