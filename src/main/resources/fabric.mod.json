@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "scrollable_tooltips",
+  "id": "text_overflow_scroll",
   "name": "Scrollable Tooltips",
   "description": "Allows for scrolling on tooltips",
   "version": "${version}",
