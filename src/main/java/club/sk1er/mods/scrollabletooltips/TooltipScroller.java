@@ -3,8 +3,14 @@ package club.sk1er.mods.scrollabletooltips;
 import gg.essential.universal.UKeyboard;
 import gg.essential.universal.UScreen;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.slot.Slot;
+
+//#if MC>=12109
+//$$ import org.joml.Matrix3x2fStack;
+//#else
+import net.minecraft.client.util.math.MatrixStack;
+//#endif
+
 
 public class TooltipScroller {
     public static boolean needsReset;
@@ -15,7 +21,13 @@ public class TooltipScroller {
 
     public static Slot currentSlot;
 
-    public static void translateTooltip(MatrixStack matrixStack, int tooltipY, int tooltipHeight) {
+    public static void translateTooltip(
+            //#if MC>=12109
+            //$$ Matrix3x2fStack matrixStack,
+            //#else
+            MatrixStack matrixStack,
+            //#endif
+            int tooltipY, int tooltipHeight) {
         Screen screen = UScreen.getCurrentScreen();
         assert screen != null;
 
@@ -47,8 +59,13 @@ public class TooltipScroller {
             }
         }
 
+        //#if MC>=12109
+        //$$ matrixStack.translate((float) scrollX, (float) scrollY);
+        //$$ matrixStack.scale(zoomFactor, zoomFactor);
+        //#else
         matrixStack.translate(scrollX, scrollY, 0);
         matrixStack.scale(zoomFactor, zoomFactor, 1.0f);
+        //#endif
     }
 
     public static void resetScroll() {

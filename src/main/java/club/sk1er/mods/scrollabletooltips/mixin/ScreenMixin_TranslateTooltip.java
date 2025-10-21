@@ -20,6 +20,8 @@ import java.util.List;
 
 //#if FORGE || NEOFORGE
 //$$ import com.mojang.blaze3d.vertex.PoseStack;
+//#elseif MC>=12109
+//$$ import org.joml.Matrix3x2fStack;
 //#else
 import net.minecraft.client.util.math.MatrixStack;
 //#endif
@@ -46,6 +48,8 @@ public class ScreenMixin_TranslateTooltip {
         //$$ "renderTooltipInternal";
         //#elseif MC==12006
         //$$ "drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;IILnet/minecraft/client/gui/tooltip/TooltipPositioner;)V";
+        //#elseif MC>=12109
+        //$$ "drawTooltipImmediately(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;IILnet/minecraft/client/gui/tooltip/TooltipPositioner;Lnet/minecraft/util/Identifier;)V";
         //#elseif MC>=12105
         //$$ "drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;IILnet/minecraft/client/gui/tooltip/TooltipPositioner;Lnet/minecraft/util/Identifier;)V";
         //#else
@@ -77,6 +81,9 @@ public class ScreenMixin_TranslateTooltip {
     //#if FORGE || NEOFORGE
     //$$ @Shadow(aliases = "pose") @Final
     //$$ private PoseStack matrices;
+    //#elseif MC>=12109
+    //$$ @Shadow @Final
+    //$$ private Matrix3x2fStack matrices;
     //#else
     //$$ @Shadow @Final
     //$$ private MatrixStack matrices;
@@ -99,7 +106,11 @@ public class ScreenMixin_TranslateTooltip {
         method = scrollableTooltips$mixinTarget,
         at = @At(
             value = "INVOKE",
+            //#if MC>=12109
+            //$$ target = "Lorg/joml/Matrix3x2fStack;pushMatrix()Lorg/joml/Matrix3x2fStack;",
+            //#else
             target = "Lnet/minecraft/client/util/math/MatrixStack;push()V",
+            //#endif
             shift = At.Shift.AFTER
         )
     )
@@ -129,7 +140,11 @@ public class ScreenMixin_TranslateTooltip {
             tooltipY = screen.height - tooltipHeightRef - 6;
         }
 
+        //#if MC>=12109
+        //$$ matrices.translate(tooltipX, tooltipY);
+        //#else
         matrices.translate(tooltipX, tooltipY, 0.0);
+        //#endif
         TooltipScroller.translateTooltip(matrices, tooltipY, tooltipHeightRef);
     }
 }
