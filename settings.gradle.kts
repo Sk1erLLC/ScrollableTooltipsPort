@@ -9,7 +9,7 @@ pluginManagement {
         maven("https://repo.spongepowered.org/repository/maven-public/")
     }
     plugins {
-        val egtVersion = "0.6.7"
+        val egtVersion = "0.6.8"
         id("gg.essential.multi-version.root") version egtVersion
     }
 }
@@ -23,6 +23,7 @@ listOf(
     "1.21.5-fabric",
     "1.21.5-forge",
     "1.21.5-neoforge",
+    "1.21.9-fabric"
 ).forEach { version ->
     include(":$version")
     project(":$version").apply {

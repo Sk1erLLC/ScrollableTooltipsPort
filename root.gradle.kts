@@ -3,7 +3,7 @@ import gg.essential.gradle.util.versionFromBuildIdAndBranch
 plugins {
     kotlin("jvm") version "1.9.23" apply false
     id("gg.essential.multi-version.root")
-    id("gg.essential.loom") version "1.7.30" apply false
+    id("gg.essential.loom") version "1.7.35" apply false
 }
 
 version = "1.4.0"
@@ -14,6 +14,7 @@ preprocess {
     val fabric11902 = createNode("1.19.2-fabric", 11902, "yarn")
     val fabric12006 = createNode("1.20.6-fabric", 12006, "yarn")
     val fabric12105 = createNode("1.21.5-fabric", 12105, "yarn")
+    val fabric12109 = createNode("1.21.9-fabric", 12109, "yarn")
 
     val forge11902 = createNode("1.19.2-forge", 11902, "srg")
     val forge12006 = createNode("1.20.6-forge", 12006, "srg")
@@ -24,6 +25,7 @@ preprocess {
 
     fabric12006.link(fabric11902)
     fabric12105.link(fabric12006)
+    fabric12109.link(fabric12006)
 
     forge11902.link(fabric11902)
     forge12006.link(forge11902)

@@ -41,12 +41,13 @@ dependencies {
     if (platform.isFabric) {
         implementation(include("gg.essential:vigilance:306")!!)
         implementation(include("gg.essential:elementa:706")!!)
-        modImplementation(include("gg.essential:universalcraft-${platform.mcVersionStr}-$ucPlatform:401")!!)
+        modImplementation(include("gg.essential:universalcraft-${platform.mcVersionStr}-$ucPlatform:436")!!)
 
         val modMenuVersion = when (platform.mcVersion) {
             11902 -> "4.2.0-beta.2"
             12006 -> "10.0.0"
             12105 -> "14.0.0-rc.2"
+            12109 -> "16.0.0-rc.1"
             else -> error("Unable to determine version")
         }
         modImplementation("com.terraformersmc:modmenu:$modMenuVersion")
@@ -59,7 +60,7 @@ dependencies {
             exclude(group = "org.jetbrains.kotlin")
             exclude(module = "kotlinx-coroutines-core")
         }
-        libraryInclude("gg.essential:universalcraft-${platform.mcVersionStr}-$ucPlatform:401") {
+        libraryInclude("gg.essential:universalcraft-${platform.mcVersionStr}-$ucPlatform:436") {
             exclude(group = "org.jetbrains.kotlin")
             exclude(module = "kotlinx-coroutines-core")
         }
