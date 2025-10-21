@@ -39,8 +39,8 @@ dependencies {
         else -> error("Unable to determine platform")
     }
     if (platform.isFabric) {
-        implementation(include("gg.essential:vigilance:306")!!)
-        implementation(include("gg.essential:elementa:706")!!)
+        implementation(include("gg.essential:vigilance:312")!!)
+        implementation(include("gg.essential:elementa:710")!!)
         modImplementation(include("gg.essential:universalcraft-${platform.mcVersionStr}-$ucPlatform:436")!!)
 
         val modMenuVersion = when (platform.mcVersion) {
