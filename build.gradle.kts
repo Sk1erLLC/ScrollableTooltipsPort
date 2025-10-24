@@ -47,6 +47,7 @@ dependencies {
             11902 -> "4.2.0-beta.2"
             12006 -> "10.0.0"
             12105 -> "14.0.0-rc.2"
+            12106, 12107, 12108 -> "15.0.0"
             12109 -> "16.0.0-rc.1"
             else -> error("Unable to determine version")
         }
