@@ -5,7 +5,7 @@ import gg.essential.universal.UScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.screen.slot.Slot;
 
-//#if MC>=12109
+//#if MC>=12106
 //$$ import org.joml.Matrix3x2fStack;
 //#else
 import net.minecraft.client.util.math.MatrixStack;
@@ -22,7 +22,7 @@ public class TooltipScroller {
     public static Slot currentSlot;
 
     public static void translateTooltip(
-            //#if MC>=12109
+            //#if MC>=12106
             //$$ Matrix3x2fStack matrixStack,
             //#else
             MatrixStack matrixStack,
@@ -59,7 +59,7 @@ public class TooltipScroller {
             }
         }
 
-        //#if MC>=12109
+        //#if MC>=12106
         //$$ matrixStack.translate((float) scrollX, (float) scrollY);
         //$$ matrixStack.scale(zoomFactor, zoomFactor);
         //#else
@@ -74,11 +74,12 @@ public class TooltipScroller {
     }
 
     public static boolean scroll(double delta) {
+        if (UKeyboard.isCtrlKeyDown() && Config.zoom) {
+            zoomFactor *= (float) (1.0 + 0.1 * Math.signum(delta));
+            return true;
+        }
         if (allowScrolling) {
-            if (UKeyboard.isCtrlKeyDown() && Config.zoom) {
-                zoomFactor *= (float) (1.0 + 0.1 * Math.signum(delta));
-                return true;
-            } else if (UKeyboard.isShiftKeyDown() && Config.horizontalScrolling) {
+             if (UKeyboard.isShiftKeyDown() && Config.horizontalScrolling) {
                 scrollX += 10 * Math.signum(delta);
                 return true;
             } else if (Config.verticalScrolling) {

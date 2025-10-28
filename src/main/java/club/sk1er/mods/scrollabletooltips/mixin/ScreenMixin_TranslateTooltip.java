@@ -20,7 +20,7 @@ import java.util.List;
 
 //#if FORGE || NEOFORGE
 //$$ import com.mojang.blaze3d.vertex.PoseStack;
-//#elseif MC>=12109
+//#elseif MC>=12106
 //$$ import org.joml.Matrix3x2fStack;
 //#else
 import net.minecraft.client.util.math.MatrixStack;
@@ -81,7 +81,7 @@ public class ScreenMixin_TranslateTooltip {
     //#if FORGE || NEOFORGE
     //$$ @Shadow(aliases = "pose") @Final
     //$$ private PoseStack matrices;
-    //#elseif MC>=12109
+    //#elseif MC>=12106
     //$$ @Shadow @Final
     //$$ private Matrix3x2fStack matrices;
     //#else
@@ -106,7 +106,7 @@ public class ScreenMixin_TranslateTooltip {
         method = scrollableTooltips$mixinTarget,
         at = @At(
             value = "INVOKE",
-            //#if MC>=12109
+            //#if MC>=12106
             //$$ target = "Lorg/joml/Matrix3x2fStack;pushMatrix()Lorg/joml/Matrix3x2fStack;",
             //#else
             target = "Lnet/minecraft/client/util/math/MatrixStack;push()V",
@@ -140,7 +140,7 @@ public class ScreenMixin_TranslateTooltip {
             tooltipY = screen.height - tooltipHeightRef - 6;
         }
 
-        //#if MC>=12109
+        //#if MC>=12106
         //$$ matrices.translate(tooltipX, tooltipY);
         //#else
         matrices.translate(tooltipX, tooltipY, 0.0);
