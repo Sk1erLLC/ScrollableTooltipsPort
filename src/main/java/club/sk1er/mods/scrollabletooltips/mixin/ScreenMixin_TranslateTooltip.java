@@ -145,6 +145,6 @@ public class ScreenMixin_TranslateTooltip {
         //#else
         matrices.translate(tooltipX, tooltipY, 0.0);
         //#endif
-        TooltipScroller.translateTooltip(matrices, tooltipY, tooltipHeightRef);
+        TooltipScroller.translateTooltip(matrices, tooltipX, tooltipY, tooltipWidthRef, tooltipHeightRef);
     }
 }

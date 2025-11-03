@@ -44,6 +44,13 @@ public class Config extends Vigilant {
     )
     public static boolean startAtTop = true;
 
+    @Property(
+        name = "Enable Scrolling Small Tooltips", description = "Enable free scrolling with Alt modifier key, even when tooltips fit on screen. Disable to prevent scrolling small tooltips entirely.",
+        category = "General", subcategory = "General",
+        type = PropertyType.SWITCH
+    )
+    public static boolean enableScrollingSmallTooltips = true;
+
     public static Config INSTANCE = new Config();
 
     public Config() {
@@ -57,5 +64,6 @@ public class Config extends Vigilant {
         addDependency("verticalScrolling", "masterToggle");
         addDependency("zoom", "masterToggle");
         addDependency("startAtTop", "masterToggle");
+        addDependency("enableScrollingSmallTooltips", "masterToggle");
     }
 }
