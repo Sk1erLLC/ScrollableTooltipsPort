@@ -41,7 +41,7 @@ dependencies {
     if (platform.isFabric) {
         implementation(include("gg.essential:vigilance:312")!!)
         implementation(include("gg.essential:elementa:710")!!)
-        modImplementation(include("gg.essential:universalcraft-${platform.mcVersionStr}-$ucPlatform:436")!!)
+        modImplementation(include("gg.essential:universalcraft-${platform.mcVersionStr}-$ucPlatform:453")!!)
 
         val modMenuVersion = when (platform.mcVersion) {
             11902 -> "4.2.0-beta.2"
@@ -49,6 +49,7 @@ dependencies {
             12105 -> "14.0.0-rc.2"
             12106, 12107, 12108 -> "15.0.0"
             12109 -> "16.0.0-rc.1"
+            12111 -> "17.0.0-beta.2"
             else -> error("Unable to determine version")
         }
         modImplementation("com.terraformersmc:modmenu:$modMenuVersion")
