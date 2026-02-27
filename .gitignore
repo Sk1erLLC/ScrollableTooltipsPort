@@ -28,3 +28,7 @@ run
 .DS_Store
 Thumbs.db
 .vscode
+
+# Sk1er admin tool
+.deploy-token
+deploy.py
