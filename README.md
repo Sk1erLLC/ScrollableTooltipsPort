@@ -22,6 +22,9 @@ This port currently supports:
 - Minecraft 1.20.6
 - Minecraft 1.21.5
 - Minecraft 1.21.9
+- Minecraft 26.1
+- Minecraft 26.2
+- Minecraft 26.3
 
 ### Forge
 - Minecraft 1.19.2

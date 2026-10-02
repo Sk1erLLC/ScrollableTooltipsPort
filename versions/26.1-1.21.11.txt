@@ -1,0 +1,6 @@
+# <26.1 (Mojang, unobfuscated) name> <1.21.11 (Yarn) name>
+# Only needed for things Mojang renamed between 1.21.11 and 26.1; everything else is
+# remapped automatically via 1.21.11's official Mojang mappings.
+net.minecraft.client.gui.GuiGraphicsExtractor net.minecraft.client.gui.DrawContext
+net.minecraft.client.gui.GuiGraphicsExtractor tooltip() drawTooltipImmediately()
+net.minecraft.client.gui.GuiGraphicsExtractor pose matrices

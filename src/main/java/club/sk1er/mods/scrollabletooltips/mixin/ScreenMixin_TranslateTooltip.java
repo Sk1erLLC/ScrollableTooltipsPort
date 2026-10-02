@@ -44,7 +44,11 @@ public class ScreenMixin_TranslateTooltip {
 
     @Unique
     private static final String scrollableTooltips$mixinTarget =
-        //#if FORGE || NEOFORGE
+        // One branch per target class (Screen before 1.20.6, GuiGraphics after), otherwise the preprocessor
+        // rewrites this string with Screen's descriptor on 1.20.6+ forge/neoforge.
+        //#if FORGELIKE && MC>=12006
+        //$$ "renderTooltipInternal";
+        //#elseif FORGELIKE
         //$$ "renderTooltipInternal";
         //#elseif MC==12006
         //$$ "drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;IILnet/minecraft/client/gui/tooltip/TooltipPositioner;)V";
@@ -140,11 +144,18 @@ public class ScreenMixin_TranslateTooltip {
             tooltipY = screen.height - tooltipHeightRef - 6;
         }
 
+        // `this.` so the preprocessor can remap the @Shadow field (matrices -> pose on 26.x)
         //#if MC>=12106
-        //$$ matrices.translate(tooltipX, tooltipY);
+        //$$ this.matrices.translate(tooltipX, tooltipY);
+        //#elseif MC>=12006
+        //$$ this.matrices.translate(tooltipX, tooltipY, 0.0);
         //#else
         matrices.translate(tooltipX, tooltipY, 0.0);
         //#endif
+        //#if MC>=12006
+        //$$ TooltipScroller.translateTooltip(this.matrices, tooltipX, tooltipY, tooltipWidthRef, tooltipHeightRef);
+        //#else
         TooltipScroller.translateTooltip(matrices, tooltipX, tooltipY, tooltipWidthRef, tooltipHeightRef);
+        //#endif
     }
 }
