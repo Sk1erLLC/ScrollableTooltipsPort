@@ -1,0 +1,13 @@
+version: 1
+mod: { id: text_overflow_scroll }
+runtime:
+  fabric: [{ modrinth: fabric-language-kotlin }]
+  forge: [{ modrinth: kotlin-for-forge }]
+  neoforge: [{ modrinth: kotlin-for-forge }]
+tests:
+  tooltip-scroll:
+    platforms: "fabric >=1.21.6"
+    goal: In a single-player world, put an item whose tooltip is taller than the screen into the player's survival inventory or a chest, open that screen (not the creative tab grid), hover the item, scroll the mouse wheel down a few notches, then scroll while holding shift.
+    pass: Compared with the first frame of the hover, scrolling brings tooltip lines that started below the bottom edge of the screen into view, and shift+scroll moves the whole tooltip sideways.
+    fail: Scrolling leaves the tooltip where it was, so the lines below the bottom edge never come into view; shift+scroll doesn't move it sideways; its text is garbled, overlapping, or blank where lines should be; or the game shows an error.
+    budget: { actions: 60, minutes: 10 }

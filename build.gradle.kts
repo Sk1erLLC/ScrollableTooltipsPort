@@ -1,4 +1,5 @@
 import gg.essential.gradle.util.noServerRunConfigs
+import net.fabricmc.loom.task.RemapJarTask
 
 plugins {
     kotlin("jvm")
@@ -14,7 +15,11 @@ base.archivesName.set("$modBaseName-${platform.mcVersionStr}-${platform.loaderSt
 
 loom {
     noServerRunConfigs()
-    mixin {
+}
+// 26.x (unobfuscated): no remapping, so no mixin AP / refmap.
+// (Checked outside `loom {}` because inside it `platform` resolves to Loom's own `platform` property.)
+if (!platform.isUnobfuscated) {
+    loom.mixin {
         useLegacyMixinAp = true
         defaultRefmapName.set("mixins.scrollabletooltips.refmap.json")
     }
@@ -39,14 +44,24 @@ dependencies {
         else -> error("Unable to determine platform")
     }
     if (platform.isFabric) {
-        implementation(include("gg.essential:vigilance:306")!!)
-        implementation(include("gg.essential:elementa:706")!!)
-        modImplementation(include("gg.essential:universalcraft-${platform.mcVersionStr}-$ucPlatform:401")!!)
+        // 26.x needs newer UniversalCraft/Elementa/Vigilance builds; older versions keep the ones they shipped with.
+        val ucVersion = if (platform.isUnobfuscated) "536" else "453"
+        val elementaVersion = if (platform.isUnobfuscated) "774" else "710"
+        val vigilanceVersion = if (platform.isUnobfuscated) "314" else "312"
+        implementation(include("gg.essential:vigilance:$vigilanceVersion")!!)
+        implementation(include("gg.essential:elementa:$elementaVersion")!!)
+        modImplementation(include("gg.essential:universalcraft-${platform.mcVersionStr}-$ucPlatform:$ucVersion")!!)
 
         val modMenuVersion = when (platform.mcVersion) {
             11902 -> "4.2.0-beta.2"
             12006 -> "10.0.0"
             12105 -> "14.0.0-rc.2"
+            12106, 12107, 12108 -> "15.0.0"
+            12109 -> "16.0.0-rc.1"
+            12111 -> "17.0.0-beta.2"
+            260100 -> "18.0.2"
+            260200 -> "20.0.3"
+            260300 -> "21.0.0"
             else -> error("Unable to determine version")
         }
         modImplementation("com.terraformersmc:modmenu:$modMenuVersion")
@@ -59,7 +74,7 @@ dependencies {
             exclude(group = "org.jetbrains.kotlin")
             exclude(module = "kotlinx-coroutines-core")
         }
-        libraryInclude("gg.essential:universalcraft-${platform.mcVersionStr}-$ucPlatform:401") {
+        libraryInclude("gg.essential:universalcraft-${platform.mcVersionStr}-$ucPlatform:436") {
             exclude(group = "org.jetbrains.kotlin")
             exclude(module = "kotlinx-coroutines-core")
         }
@@ -75,7 +90,7 @@ dependencies {
         platform.isNeoForge -> "neoforge"
         else -> error("Unable to determine platform")
     }
-    modLocalRuntime("me.djtheredstoner:DevAuth-${devAuthPlatform}:1.2.1")
+    modLocalRuntime("me.djtheredstoner:DevAuth-${devAuthPlatform}:${if (platform.isUnobfuscated) "1.2.2" else "1.2.1"}")
 }
 
 tasks {
@@ -88,11 +103,23 @@ tasks {
         archiveClassifier = null
     }
 
-    remapJar {
-        dependsOn(shadowJar)
-        mustRunAfter(shadowJar)
-        inputFile = shadowJar.get().archiveFile
-        archiveClassifier = null
+    if (platform.isUnobfuscated) {
+        // No refmap is generated without remapping; drop the reference so Mixin doesn't warn about a missing file.
+        processResources {
+            filesMatching("mixins.scrollabletooltips.json") {
+                filter { line: String -> if (line.trimStart().startsWith("\"refmap\"")) "" else line }
+            }
+        }
+    }
+
+    // Unobfuscated (26.x) Loom has no remapJar task; the plain `jar` is the release artifact there.
+    if (!platform.isUnobfuscated) {
+        named<RemapJarTask>("remapJar") {
+            dependsOn(shadowJar)
+            mustRunAfter(shadowJar)
+            inputFile = shadowJar.get().archiveFile
+            archiveClassifier = null
+        }
     }
 
     shadowJar {
@@ -109,6 +136,6 @@ tasks {
         }
         mergeServiceFiles()
 
-        finalizedBy(remapJar)
+        if (!platform.isUnobfuscated) finalizedBy("remapJar")
     }
 }

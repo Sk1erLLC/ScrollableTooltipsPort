@@ -20,6 +20,8 @@ import java.util.List;
 
 //#if FORGE || NEOFORGE
 //$$ import com.mojang.blaze3d.vertex.PoseStack;
+//#elseif MC>=12106
+//$$ import org.joml.Matrix3x2fStack;
 //#else
 import net.minecraft.client.util.math.MatrixStack;
 //#endif
@@ -42,10 +44,16 @@ public class ScreenMixin_TranslateTooltip {
 
     @Unique
     private static final String scrollableTooltips$mixinTarget =
-        //#if FORGE || NEOFORGE
+        // One branch per target class (Screen before 1.20.6, GuiGraphics after), otherwise the preprocessor
+        // rewrites this string with Screen's descriptor on 1.20.6+ forge/neoforge.
+        //#if FORGELIKE && MC>=12006
+        //$$ "renderTooltipInternal";
+        //#elseif FORGELIKE
         //$$ "renderTooltipInternal";
         //#elseif MC==12006
         //$$ "drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;IILnet/minecraft/client/gui/tooltip/TooltipPositioner;)V";
+        //#elseif MC>=12109
+        //$$ "drawTooltipImmediately(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;IILnet/minecraft/client/gui/tooltip/TooltipPositioner;Lnet/minecraft/util/Identifier;)V";
         //#elseif MC>=12105
         //$$ "drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;IILnet/minecraft/client/gui/tooltip/TooltipPositioner;Lnet/minecraft/util/Identifier;)V";
         //#else
@@ -77,6 +85,9 @@ public class ScreenMixin_TranslateTooltip {
     //#if FORGE || NEOFORGE
     //$$ @Shadow(aliases = "pose") @Final
     //$$ private PoseStack matrices;
+    //#elseif MC>=12106
+    //$$ @Shadow @Final
+    //$$ private Matrix3x2fStack matrices;
     //#else
     //$$ @Shadow @Final
     //$$ private MatrixStack matrices;
@@ -99,7 +110,11 @@ public class ScreenMixin_TranslateTooltip {
         method = scrollableTooltips$mixinTarget,
         at = @At(
             value = "INVOKE",
+            //#if MC>=12106
+            //$$ target = "Lorg/joml/Matrix3x2fStack;pushMatrix()Lorg/joml/Matrix3x2fStack;",
+            //#else
             target = "Lnet/minecraft/client/util/math/MatrixStack;push()V",
+            //#endif
             shift = At.Shift.AFTER
         )
     )
@@ -129,7 +144,18 @@ public class ScreenMixin_TranslateTooltip {
             tooltipY = screen.height - tooltipHeightRef - 6;
         }
 
+        // `this.` so the preprocessor can remap the @Shadow field (matrices -> pose on 26.x)
+        //#if MC>=12106
+        //$$ this.matrices.translate(tooltipX, tooltipY);
+        //#elseif MC>=12006
+        //$$ this.matrices.translate(tooltipX, tooltipY, 0.0);
+        //#else
         matrices.translate(tooltipX, tooltipY, 0.0);
-        TooltipScroller.translateTooltip(matrices, tooltipY, tooltipHeightRef);
+        //#endif
+        //#if MC>=12006
+        //$$ TooltipScroller.translateTooltip(this.matrices, tooltipX, tooltipY, tooltipWidthRef, tooltipHeightRef);
+        //#else
+        TooltipScroller.translateTooltip(matrices, tooltipX, tooltipY, tooltipWidthRef, tooltipHeightRef);
+        //#endif
     }
 }
