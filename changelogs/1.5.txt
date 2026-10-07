@@ -1,0 +1,7 @@
+- Added support for Minecraft 26.1, 26.2 and 26.3 (Fabric)
+- Added Fabric builds for Minecraft 1.21.6 and 1.21.7 (the 1.21.7 build also runs on 1.21.8)
+- Hold Alt to scroll any tooltip, even one that fits on the screen; the new "Enable Scrolling Small Tooltips" setting turns this off
+- Zooming (Ctrl + scroll) now works on every tooltip, not only ones that overflow the screen
+- Scrolling now keeps the tooltip on screen horizontally as well as vertically, and takes zoom into account
+- "Start at top" now only applies to tooltips taller than the screen
+- Updated Vigilance and Elementa on Fabric, fixing visual glitches in the settings menu

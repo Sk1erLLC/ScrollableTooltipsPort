@@ -21,7 +21,10 @@ This port currently supports:
 - Minecraft 1.19.2
 - Minecraft 1.20.6
 - Minecraft 1.21.5
-- Minecraft 1.21.9
+- Minecraft 1.21.6
+- Minecraft 1.21.7 and 1.21.8
+- Minecraft 1.21.9 and 1.21.10
+- Minecraft 1.21.11
 - Minecraft 26.1
 - Minecraft 26.2
 - Minecraft 26.3
@@ -54,6 +57,8 @@ This port currently supports:
 Once installed, the mod works automatically:
 - When viewing an item tooltip that extends beyond the screen, use your **mouse wheel** to scroll up and down
 - Hold **Shift** and use your **mouse wheel** to scroll left and right
+- Hold **Alt** and use your **mouse wheel** to scroll a tooltip that already fits on the screen (turn this off with "Enable Scrolling Small Tooltips")
+- Hold **Ctrl** and use your **mouse wheel** to zoom the tooltip
 
 Access the configuration screen through Mod Menu (Fabric) or the Mods menu (Forge/NeoForge).
 
